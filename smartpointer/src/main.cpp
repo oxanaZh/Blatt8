@@ -8,8 +8,8 @@
 
 #include "SmartPointer.h"
 
-void main(){
-
+int main(){
+	return 0;
 }
 
 

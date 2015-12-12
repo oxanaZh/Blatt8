@@ -32,10 +32,10 @@ public:
     T &operator*() const;
 
     // Returns a pointer to the managed object
-    const T *getObject() const;
+    T *getObject() const;
 
     // Returns the number of SmartPointer objects referring to the same managed object
-    const RefCounter *getRefCounter() const;
+    RefCounter *getRefCounter() const;
 
     // Assigns the SmartPointer
     const SmartPointer &operator=(T * const p);
@@ -46,7 +46,9 @@ public:
     bool operator!=(const SmartPointer&) const;
 
     // Checks if there is associated managed object
-    operator bool() const;
+    operator bool() const{
+		return pObj != nullptr;
+    }
 
 private:
     // Pointer to the current object
@@ -55,8 +57,9 @@ private:
     // Pointer to the reference counter (used for the current object)
     RefCounter *rc;
 
-    // Auxiliary function: decrements reference counter and deletes object and
-    // reference counter, if necessary
+    /** Auxiliary function: decrements reference counter and deletes object and
+     *reference counter, if necessary
+     */
     void deleteObject();
 };
 
@@ -65,58 +68,100 @@ private:
  * Eigentliche Smartpointer-Klasse (Implementierung: Template -> .h)
  * ===========================================================================
  */
+template<typename T>
+SmartPointer<T>::SmartPointer(T * const p){
 
-SmartPointer::SmartPointer(T * const p = nullptr){
+	if(p == nullptr || p == 0){
+		pObj = nullptr;
+		rc = nullptr;
+	} else {
+		pObj = p;
+		rc = new RefCounter;
+		rc->inc();
+	}
+}
+
+template<typename T>
+SmartPointer<T>::SmartPointer(const SmartPointer& sp){
+	if(sp){
+		*this = sp;
+	}
+
+}
+
+template<typename T>
+SmartPointer<T>::~SmartPointer(){
+	deleteObject();
+}
+
+template<typename T>
+T* SmartPointer<T>::operator->() const{
+	if(pObj==nullptr){
+		//exception
+		return nullptr;
+	}
+	return pObj;
+}
+
+template<typename T>
+T& SmartPointer<T>::operator*() const{
+	if(pObj==nullptr){
+		throw NullPointerException();
+	}
+	return *pObj;
+}
+
+template<typename T>
+T* SmartPointer<T>::getObject() const{
+	return pObj;
+}
+
+template<typename T>
+RefCounter* SmartPointer<T>::getRefCounter() const{
+	return rc;
+}
+
+template<typename T>
+const SmartPointer<T>& SmartPointer<T>::operator=(T * const p){
+	delete pObj;
 	pObj = p;
 	rc = new RefCounter;
-	if(p != nullptr){
-		rc.inc();
+	rc->inc();
+	return *this;
+}
+
+template<typename T>
+const SmartPointer<T>& SmartPointer<T>::operator=(const SmartPointer<T>& sp){
+	if(*this != sp){
+		deleteObject();
+		pObj = sp.getObject();
+		rc = sp.getRefCounter();
+		rc->inc();
 	}
 
+	return *this;
 }
-SmartPointer::SmartPointer(const SmartPointer::SmartPointer& sp){
-	SmartPointer::pObj = sp.getObject();
-	SmartPointer::rc = sp.getRefCounter();
-   SmartPointer::rc.inc();
-}
-virtual SmartPointer::~SmartPointer(){
-	if(SmartPointer::rc.isZero()){
-		//löschen inhalt und pointer selbst
-		SmartPointer::deleteObject();
-	} else {
-		//löschen nur pointer und rc.dec()
 
+template<typename T>
+bool SmartPointer<T>::operator==(const SmartPointer& sp) const{
+	if(sp == nullptr){
+		return false;
 	}
+	return pObj==sp.getObject() && rc == sp.getRefCounter();
 }
-T SmartPointer::*operator->() const{
 
+template<typename T>
+bool SmartPointer<T>::operator!=(const SmartPointer& sp) const{
+	return !(*this == sp);
 }
-T SmartPointer::&operator*() const{
 
-}
-const T SmartPointer::*getObject() const{
-
-}
-const RefCounter SmartPointer::*getRefCounter() const{
-
-}
-const SmartPointer SmartPointer::&operator=(T * const p){
-
-}
-const SmartPointer SmartPointer::&operator=(const SmartPointer&){
-
-}
-bool SmartPointer::operator==(const SmartPointer& sp) const{
-	return (SmartPointer::*pObj==sp.getObject()) && (SmartPointer::rc == sp.getRefCounter());
-}
-bool SmartPointer::operator!=(const SmartPointer&) const{
-	return !((SmartPointer::*pObj==sp.getObject()) && (SmartPointer::rc == sp.getRefCounter())) ;
-}
-operator bool() const{
-
-}
-void SmartPointer::deleteObject(){
-
+template<typename T>
+void SmartPointer<T>::deleteObject(){
+	rc->dec();
+	if(rc->isZero()){
+		delete pObj;
+		delete rc;
+	}
 }
 #endif  // SMARTPOINTER_H
 

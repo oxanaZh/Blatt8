@@ -12,25 +12,19 @@
  */
 
 RefCounter::RefCounter(){
-	RefCounter::n =0;
+	n =0;
 }
 void RefCounter::inc(){
-	RefCounter::n++;
+	n++;
 }
 void RefCounter::dec(){
-	RefCounter::n--;
+	if(n>0){n--;}
 }
 bool RefCounter::isZero() const{
 	return n< 1;
 }
 unsigned int RefCounter::getRefCount() const{
-	return RefCounter::n;
-}
-RefCounter::RefCounter(const RefCounter::RefCounter&) = delete{
-
-}
-RefCounter::RefCounter RefCounter::&operator=(const RefCounter::RefCounter& rc) = delete{
-	RefCounter::n = rc.getRefCount();
+	return n;
 }
 
 
