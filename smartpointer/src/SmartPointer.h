@@ -32,10 +32,10 @@ public:
     T &operator*() const throw(NullPointerException);
 
     // Returns a pointer to the managed object
-    T *getObject() const;
+    const T *getObject() const;
 
     // Returns the number of SmartPointer objects referring to the same managed object
-    RefCounter *getRefCounter() const;
+    const RefCounter *getRefCounter() const;
 
     // Assigns the SmartPointer
     const SmartPointer &operator=(T * const p);
@@ -109,12 +109,12 @@ T& SmartPointer<T>::operator*() const throw(NullPointerException){
 }
 
 template<typename T>
-T* SmartPointer<T>::getObject() const{
+const T *SmartPointer<T>::getObject() const{
 	return pObj;
 }
 
 template<typename T>
-RefCounter* SmartPointer<T>::getRefCounter() const{
+const RefCounter *SmartPointer<T>::getRefCounter() const{
 	return rc;
 }
 
@@ -143,8 +143,8 @@ template<typename T>
 const SmartPointer<T>& SmartPointer<T>::operator=(const SmartPointer<T>& sp){
 	if((*this != sp) || !sp){
 		deleteObject();
-		pObj = sp.getObject();
-		rc = sp.getRefCounter();
+		pObj = const_cast<T*>(sp.getObject());
+		rc =  const_cast<RefCounter*>(sp.getRefCounter());
 		if(rc){
 			rc->inc();
 		}
