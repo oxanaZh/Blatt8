@@ -11,9 +11,13 @@
 using namespace std;
 class NullPointerException : public std::exception {
 	public:
-	const char* what(){return message.c_str();};
+	NullPointerException(){message = "nullpointer exception";}
+	const char* what() const noexcept(true)
+	{
+		return message.c_str();
+	};
 	private:
-	std::string message = "nullpointer exception";
+	std::string message;
 };
 
 

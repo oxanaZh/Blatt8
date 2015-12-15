@@ -28,8 +28,8 @@ public:
     virtual ~SmartPointer();
 
     // Dereferences pointer to the managed object
-    T *operator->() const;
-    T &operator*() const;
+    T *operator->() const throw(NullPointerException);
+    T &operator*() const ;
 
     // Returns a pointer to the managed object
     T *getObject() const;
@@ -69,24 +69,22 @@ private:
  * ===========================================================================
  */
 template<typename T>
-SmartPointer<T>::SmartPointer(T * const p){
-
-	if(p == nullptr || p == 0){
-		pObj = nullptr;
-		rc = nullptr;
-	} else {
-		pObj = p;
-		rc = new RefCounter;
-		rc->inc();
+SmartPointer<T>::SmartPointer(T * const p) : pObj(nullptr), rc(nullptr) {
+	if(p != nullptr && pObj != p){
+		*this = p;
 	}
+
 }
 
 template<typename T>
-SmartPointer<T>::SmartPointer(const SmartPointer& sp){
-	if(sp){
+SmartPointer<T>::SmartPointer(const SmartPointer& sp): pObj(nullptr), rc(nullptr){
+	if(sp && *this != sp){
 		*this = sp;
 	}
-
+	else {
+		pObj = nullptr;
+		rc = nullptr;
+	}
 }
 
 template<typename T>
@@ -95,19 +93,18 @@ SmartPointer<T>::~SmartPointer(){
 }
 
 template<typename T>
-T* SmartPointer<T>::operator->() const{
+T* SmartPointer<T>::operator->() const throw(NullPointerException) {
 	if(pObj==nullptr){
-		//exception
-		return nullptr;
+		throw NullPointerException();
 	}
 	return pObj;
 }
 
 template<typename T>
-T& SmartPointer<T>::operator*() const{
-	if(pObj==nullptr){
-		throw NullPointerException();
-	}
+T& SmartPointer<T>::operator*() const {
+//	if(pObj==nullptr){
+//		throw NullPointerException();
+//	}
 	return *pObj;
 }
 
@@ -123,20 +120,35 @@ RefCounter* SmartPointer<T>::getRefCounter() const{
 
 template<typename T>
 const SmartPointer<T>& SmartPointer<T>::operator=(T * const p){
-	delete pObj;
-	pObj = p;
-	rc = new RefCounter;
-	rc->inc();
+	if(pObj != p){
+		if(*this ){
+			deleteObject();
+		}
+
+		if(p == nullptr || p == 0){
+			pObj = nullptr;
+			rc = nullptr;
+		} else {
+			pObj = p;
+			rc = new RefCounter;
+			rc->inc();
+		}
+
+	}
+
 	return *this;
 }
 
 template<typename T>
 const SmartPointer<T>& SmartPointer<T>::operator=(const SmartPointer<T>& sp){
-	if(*this != sp){
+	if((*this != sp) || !sp){
 		deleteObject();
 		pObj = sp.getObject();
 		rc = sp.getRefCounter();
-		rc->inc();
+		if(rc){
+			rc->inc();
+		}
+
 	}
 
 	return *this;
@@ -144,10 +156,11 @@ const SmartPointer<T>& SmartPointer<T>::operator=(const SmartPointer<T>& sp){
 
 template<typename T>
 bool SmartPointer<T>::operator==(const SmartPointer& sp) const{
-	if(sp == nullptr){
-		return false;
+
+	if(sp){
+		return pObj==sp.getObject() && rc == sp.getRefCounter();
 	}
-	return pObj==sp.getObject() && rc == sp.getRefCounter();
+	return false;
 }
 
 template<typename T>
@@ -157,11 +170,15 @@ bool SmartPointer<T>::operator!=(const SmartPointer& sp) const{
 
 template<typename T>
 void SmartPointer<T>::deleteObject(){
-	rc->dec();
-	if(rc->isZero()){
-		delete pObj;
-		delete rc;
+	if(rc != nullptr){
+		rc->dec();
+		if(rc->isZero()){
+			delete pObj;
+			delete rc;
+		}
+
 	}
+
 }
 #endif  // SMARTPOINTER_H
 
