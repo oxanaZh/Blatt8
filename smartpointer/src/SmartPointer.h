@@ -29,7 +29,7 @@ public:
 
     // Dereferences pointer to the managed object
     T *operator->() const throw(NullPointerException);
-    T &operator*() const ;
+    T &operator*() const throw(NullPointerException);
 
     // Returns a pointer to the managed object
     T *getObject() const;
@@ -101,10 +101,10 @@ T* SmartPointer<T>::operator->() const throw(NullPointerException) {
 }
 
 template<typename T>
-T& SmartPointer<T>::operator*() const {
-//	if(pObj==nullptr){
-//		throw NullPointerException();
-//	}
+T& SmartPointer<T>::operator*() const throw(NullPointerException){
+	if(pObj==nullptr){
+		throw NullPointerException();
+	}
 	return *pObj;
 }
 
