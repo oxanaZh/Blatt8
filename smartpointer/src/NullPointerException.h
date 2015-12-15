@@ -17,9 +17,8 @@ class NullPointerException : public std::exception {
 		return message.c_str();
 	};
 	private:
-	std::string message;
+		std::string message;
 };
 
 
 #endif /* NULLPOINTEREXCEPTION_H_ */
-

@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "SmartPointer.h"
+
 class A {
 	public:
 		A() {
@@ -17,6 +18,7 @@ class A {
 	private:
 	int i;
 };
+
 int main(){
 	SmartPointer<A> sp1 { new A };
 	cout <<"sp1->getI(): "<<sp1->getI() << endl;
@@ -45,6 +47,3 @@ int main(){
 	}
 	return 0;
 }
-
-
-

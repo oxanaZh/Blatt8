@@ -73,7 +73,6 @@ SmartPointer<T>::SmartPointer(T * const p) : pObj(nullptr), rc(nullptr) {
 	if(p != nullptr && pObj != p){
 		*this = p;
 	}
-
 }
 
 template<typename T>
@@ -133,9 +132,7 @@ const SmartPointer<T>& SmartPointer<T>::operator=(T * const p){
 			rc = new RefCounter;
 			rc->inc();
 		}
-
 	}
-
 	return *this;
 }
 
@@ -148,7 +145,6 @@ const SmartPointer<T>& SmartPointer<T>::operator=(const SmartPointer<T>& sp){
 		if(rc){
 			rc->inc();
 		}
-
 	}
 
 	return *this;
@@ -156,10 +152,7 @@ const SmartPointer<T>& SmartPointer<T>::operator=(const SmartPointer<T>& sp){
 
 template<typename T>
 bool SmartPointer<T>::operator==(const SmartPointer& sp) const{
-
 	return pObj==sp.getObject() && rc == sp.getRefCounter();
-
-	return false;
 }
 
 template<typename T>
@@ -175,9 +168,6 @@ void SmartPointer<T>::deleteObject(){
 			delete pObj;
 			delete rc;
 		}
-
 	}
-
 }
 #endif  // SMARTPOINTER_H
-

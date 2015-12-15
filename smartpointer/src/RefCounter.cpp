@@ -12,21 +12,19 @@
  */
 
 RefCounter::RefCounter(){
-	n =0;
+	n = 0;
 }
 void RefCounter::inc(){
 	n++;
 }
 void RefCounter::dec(){
-	if(n>0){n--;}
+	if(n > 0){
+		n--;
+	}
 }
 bool RefCounter::isZero() const{
-	return n< 1;
+	return n < 1;
 }
 unsigned int RefCounter::getRefCount() const{
 	return n;
 }
-
-
-
-
