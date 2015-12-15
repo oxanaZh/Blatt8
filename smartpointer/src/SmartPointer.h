@@ -157,9 +157,8 @@ const SmartPointer<T>& SmartPointer<T>::operator=(const SmartPointer<T>& sp){
 template<typename T>
 bool SmartPointer<T>::operator==(const SmartPointer& sp) const{
 
-	if(sp){
-		return pObj==sp.getObject() && rc == sp.getRefCounter();
-	}
+	return pObj==sp.getObject() && rc == sp.getRefCounter();
+
 	return false;
 }
 
